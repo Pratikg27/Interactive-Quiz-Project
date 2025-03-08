@@ -1,158 +1,181 @@
 // Quiz questions and answers
 const quizData = [
     {
-       question: 'What does the term "Full Stack Development" refer to?',
-       options: [
-           "Development that involves stack data structures",
-           "Development that involves front-end and back-end programming",
-           "Development that involves back-end programming",
-           "None of above"
-       ],
-       answer: "Development that involves front-end and back-end programming"
+        question: 'What does the term "Full Stack Development" refer to?',
+        options: [
+            "Development that involves stack data structures",
+            "Development that involves front-end and back-end programming",
+            "Development that involves back-end programming",
+            "None of above"
+        ],
+        answer: "Development that involves front-end and back-end programming"
     },
     {
-       question: "CRUD stands for?",
-       options: [
-           "Create, Read, Upload, Delete",
-           "Create, Read, Upgrade, Deploy",
-           "Create, Remove, Upgrade, Delete",
-           "Create, Read, Update, Delete"
-       ],
-       answer: "Create, Read, Update, Delete"
+        question: "CRUD stands for?",
+        options: [
+            "Create, Read, Upload, Delete",
+            "Create, Read, Upgrade, Deploy",
+            "Create, Remove, Upgrade, Delete",
+            "Create, Read, Update, Delete"
+        ],
+        answer: "Create, Read, Update, Delete"
     },
     {
-       question: "Is JavaScript synchronous or asynchronous?",
-       options: [
-           "Synchronous",
-           "Asynchronous",
-           "Both",
-           "Synchronous but can be used as asynchronous"
-       ],
-       answer: "Synchronous but can be used as asynchronous"
+        question: "Which of the following is used to style web pages?",
+        options: [
+            "HTML",
+            "JavaScript",
+            "CSS",
+            "Python"
+        ],
+        answer: "CSS"
     },
     {
-       question: "Amongst which of the following protocol is used to exchange the data between client and server?",
-       options: ["HTTP", "TCP/IP", "SMTP", "FTP"],
-       answer: "HTTP"
+        question: "Which protocol is used to secure data transfer over the internet?",
+        options: [
+            "HTTP",
+            "FTP",
+            "HTTPS",
+            "SMTP"
+        ],
+        answer: "HTTPS"
     },
     {
-       question: "DOM stands for?",
-       options: [
-           "Document Object Model",
-           "Direct Object Model",
-           "Direct Over Model",
-           "Document Over Model"
-       ],
-       answer: "Document Object Model"
-    },
-    {
-       question: "SQL stands for?",
-       options: [
-           "Standard Query Language",
-           "Structured Query Language",
-           "Structured Quality Language",
-           "Standard Query Language"
-       ],
-       answer: "Structured Query Language"
-    },
-    {
-       question: "What is the purpose of CSS in Full Stack Development?",
-       options: [
-           "To style and format HTML elements",
-           "To manage HTTP requests and responses",
-           "To store and retrieve data",
-           "None of the above"
-       ],
-       answer: "To style and format HTML elements"
-    },
-    {
-       question: "Which of the following is not LAMP Stack?",
-       options: ["Linux", "Apache", "MySQL", "Django"],
-       answer: "Django"
-    },
-    {
-       question: "MEAN Stack Expands to?",
-       options: [
-           "MongoDB, Express.js, Angular JS and Node.js",
-           "Microsoft Windows, Express.js, AmigaOS and Nox.js",
-           "MSX-DOS, Execution model, Angular JS and Node.js",
-           "None of the above"
-       ],
-       answer: "MongoDB, Express.js, Angular JS and Node.js"
-    },
-    {
-       question: "Which of the following Programming Language is Used in Server-Side Scripting?",
-       options: ["Javascript", "Python", "PHP", "HTML"],
-       answer: "PHP"
+        question: "What does the acronym 'DOM' stand for?",
+        options: [
+            "Document Object Model",
+            "Data Object Model",
+            "Digital Object Management",
+            "Dynamic Object Model"
+        ],
+        answer: "Document Object Model"
     }
 ];
 
-// Function to load the quiz questions
-function loadQuiz() {
-    const quizContainer = document.getElementById("quiz");
+let currentQuestion = 0;
+let score = 0;
+let questionTimer;
+let overallTimeLeft = 900; // 15 minutes (900 seconds)
+let questionTimeLeft = 60; // 60 seconds per question
+let userAnswers = new Array(quizData.length).fill(null); // Store selected answers
+
+const quizSection = document.getElementById("quiz-section");
+const quizContainer = document.getElementById("quiz");
+const questionTimerElement = document.getElementById("question-timer");
+const overallTimerElement = document.getElementById("overall-timer");
+const startButton = document.getElementById("start");
+const prevButton = document.getElementById("prev");
+const submitButton = document.getElementById("submit");
+
+// Start Quiz
+startButton.addEventListener("click", startQuiz);
+prevButton.addEventListener("click", prevQuestion);
+submitButton.addEventListener("click", submitQuiz);
+
+function startQuiz() {
+    startButton.style.display = "none";
+    quizSection.style.display = "block";
+    loadQuestion();
+    startOverallTimer();
+    startQuestionTimer();
+}
+
+function loadQuestion() {
     quizContainer.innerHTML = "";
+    const item = quizData[currentQuestion];
 
-    quizData.forEach((item, index) => {
-        const questionDiv = document.createElement("div");
-        questionDiv.classList.add("question");
-        questionDiv.innerHTML = `<p>${index + 1}. ${item.question}</p>`;
+    const questionDiv = document.createElement("div");
+    questionDiv.classList.add("question");
+    questionDiv.innerHTML = `<p>${currentQuestion + 1}. ${item.question}</p>`;
 
-        const optionsDiv = document.createElement("div");
-        optionsDiv.classList.add("options");
+    const optionsDiv = document.createElement("div");
+    optionsDiv.classList.add("options");
 
-        item.options.forEach(option => {
-            const optionLabel = document.createElement("label");
-            optionLabel.innerHTML = `
-                <input type="radio" name="question${index}" value="${option}">
-                ${option}
-            `;
-            optionsDiv.appendChild(optionLabel);
-        });
-
-        questionDiv.appendChild(optionsDiv);
-        quizContainer.appendChild(questionDiv);
+    item.options.forEach(option => {
+        const optionLabel = document.createElement("label");
+        optionLabel.innerHTML = `
+            <input type="radio" name="question" value="${option}" ${userAnswers[currentQuestion] === option ? "checked" : ""}> 
+            ${option}
+        `;
+        optionsDiv.appendChild(optionLabel);
     });
+
+    questionDiv.appendChild(optionsDiv);
+    quizContainer.appendChild(questionDiv);
+
+    // Disable "Previous" on the first question
+    prevButton.disabled = currentQuestion === 0;
+
+    // Change submit button text for the last question
+    submitButton.innerText = currentQuestion === quizData.length - 1 ? "Submit Quiz" : "Next";
 }
 
-// Function to calculate and display the score
-function calculateScore() {
-    let score = 0;
+function startQuestionTimer() {
+    clearInterval(questionTimer);
+    questionTimeLeft = 60;
+    questionTimerElement.innerText = `Time Left for Question: ${questionTimeLeft}s`;
 
-    quizData.forEach((item, index) => {
-        const selectedOption = document.querySelector(`input[name="question${index}"]:checked`);
-        if (selectedOption && selectedOption.value === item.answer) {
-            score++;
+    questionTimer = setInterval(() => {
+        if (questionTimeLeft > 0) {
+            questionTimeLeft--;
+            questionTimerElement.innerText = `Time Left for Question: ${questionTimeLeft}s`;
+        } else {
+            clearInterval(questionTimer);
+            if (currentQuestion < quizData.length - 1) {
+                nextQuestion();
+            } else {
+                submitQuiz();
+            }
         }
-    });
-
-    const resultContainer = document.getElementById("result");
-    resultContainer.innerHTML = `You scored ${score} out of ${quizData.length}!`;
+    }, 1000);
 }
 
-// Load the quiz when the page loads
-window.onload = () => {
-    loadQuiz();
-};
+function startOverallTimer() {
+    const overallTimer = setInterval(() => {
+        if (overallTimeLeft > 0) {
+            overallTimeLeft--;
+            let minutes = Math.floor(overallTimeLeft / 60);
+            let seconds = overallTimeLeft % 60;
+            overallTimerElement.innerText = `Total Time Left: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+        } else {
+            clearInterval(overallTimer);
+            submitQuiz();
+        }
+    }, 1000);
+}
 
-// Event listener for submit button
-document.getElementById("submit").addEventListener("click", () => {
-    clearInterval(timer); // Stop the timer when submitting
-    calculateScore();
-});
-
-// Timer functionality
-let timeLeft = 600; // 10 minutes (600 seconds)
-const timerElement = document.createElement("p");
-timerElement.id = "timer";
-document.querySelector(".quiz-container").prepend(timerElement);
-
-const timer = setInterval(() => {
-    if (timeLeft >= 0) {
-        timerElement.innerText = `Time Left: ${timeLeft}s`;
-        timeLeft--;
-    } else {
-        clearInterval(timer);
-        calculateScore();
-        document.getElementById("submit").disabled = true;
+function saveAnswer() {
+    const selectedOption = document.querySelector('input[name="question"]:checked');
+    if (selectedOption) {
+        userAnswers[currentQuestion] = selectedOption.value;
     }
-}, 1000);
+}
+
+function prevQuestion() {
+    saveAnswer();
+    if (currentQuestion > 0) {
+        currentQuestion--;
+        loadQuestion();
+        startQuestionTimer();
+    }
+}
+
+function submitQuiz() {
+    saveAnswer();
+
+    if (currentQuestion < quizData.length - 1) {
+        currentQuestion++;
+        loadQuestion();
+        startQuestionTimer();
+    } else {
+        clearInterval(questionTimer);
+        clearInterval(overallTimeLeft);
+
+        score = userAnswers.reduce((total, answer, index) => {
+            return answer === quizData[index].answer ? total + 1 : total;
+        }, 0);
+
+        document.getElementById("result").innerHTML = `You scored ${score} out of ${quizData.length}!`;
+        alert(`Quiz Completed! You scored ${score} out of ${quizData.length}!`);
+    }
+}

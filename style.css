@@ -10,18 +10,13 @@ body {
 
 /* Styling the quiz container */
 .quiz-container {
-    background: whitesmoke; 
+    background: whitesmoke;
     max-width: 500px;
     margin: auto;
     padding: 20px;
     border-radius: 10px;
     box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.3);
     transition: 0.3s ease-in-out;
-}
-
-/* On hover, add more shadow effect */
-.quiz-container:hover {
-    box-shadow: 8px 8px 20px rgba(0, 0, 0, 0.5);
 }
 
 /* Heading */
@@ -31,7 +26,7 @@ h1 {
     font-weight: bold;
 }
 
-/* Styling for each question */
+/* Question and options styling */
 .question {
     font-size: 18px;
     font-weight: bold;
@@ -40,7 +35,6 @@ h1 {
     color: #333;
 }
 
-/* Styling the options */
 .options {
     text-align: left;
 }
@@ -54,14 +48,14 @@ h1 {
     cursor: pointer;
 }
 
-/* When hovering over an option */
+/* On hover, highlight options */
 .options label:hover {
     background-color: #f1c40f;
     color: #fff;
 }
 
-/* Submit button styling */
-#submit {
+/* Buttons styling */
+#start, #submit, .navigation-buttons button {
     background-color: #27ae60;
     color: white;
     border: none;
@@ -74,16 +68,45 @@ h1 {
     transition: 0.3s ease-in-out;
 }
 
-/* On hover, change button color */
-#submit:hover {
+#start:hover, #submit:hover, .navigation-buttons button:hover {
     background-color: #218c53;
     box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.3);
 }
 
-/* Display the result message */
+/* Result message */
 #result {
     font-size: 20px;
     font-weight: bold;
     margin-top: 20px;
     color: #e74c3c;
+}
+/* Apply flexbox for button alignment */
+.button-container {
+    display: flex;
+    justify-content: space-between;  /* Space between buttons */
+    margin-top: 20px;
+}
+
+/* Common button styling */
+button {
+    background-color: #27ae60;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    font-size: 18px;
+    cursor: pointer;
+    border-radius: 8px;
+    box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);
+    transition: 0.3s ease-in-out;
+}
+
+button:hover {
+    background-color: #218c53;
+    box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* Disable button styling */
+button:disabled {
+    background-color: gray;
+    cursor: not-allowed;
 }
